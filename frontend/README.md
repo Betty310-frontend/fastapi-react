@@ -35,8 +35,37 @@ npm install
 npm run dev
 ```
 
+## ⚙️ 환경 변수 설정
+
+이 프로젝트는 다양한 환경에서 실행할 수 있도록 환경 변수를 사용합니다.
+
+### 환경 파일 종류
+- `.env` - 기본 환경 변수
+- `.env.development` - 개발 환경용
+- `.env.production` - 프로덕션 환경용
+- `.env.local` - 로컬 개발용 (Git에 커밋되지 않음)
+
+### 주요 환경 변수
+```bash
+VITE_API_BASE_URL=http://localhost:8000  # FastAPI 서버 URL
+VITE_DEBUG=true                          # 디버그 모드
+VITE_PORT=5173                           # 개발 서버 포트
+```
+
+### 환경 변수 사용 예시
+```typescript
+import { config, createApiUrl } from './config/env'
+
+// API URL 생성
+const apiUrl = createApiUrl("users")  // http://localhost:8000/users
+
+console.log(config.debug)      // 디버그 모드 여부
+```
+
 ## 📝 중요한 참고사항
 
 > **TypeScript 사용**: 이 프로젝트는 TypeScript를 사용합니다. 코드 작성 시 타입을 명시해주세요.
 
 > **개발 서버**: `npm run dev` 실행 후 브라우저에서 `http://localhost:5173`으로 접속할 수 있습니다.
+
+> **환경 변수**: Vite에서는 환경 변수가 `VITE_` 접두사로 시작해야 클라이언트에서 접근할 수 있습니다.
