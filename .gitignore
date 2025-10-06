@@ -135,6 +135,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env.local
+.env.production
 .env
 .envrc
 .venv
@@ -143,6 +145,19 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+dev.db
+local_dev.db
+test.db
+myapi.db
+
+# Environment templates (keep the templates, ignore actual env files)
+# .env.development - 개발팀 공유용 템플릿이므로 포함
+# .env.production - 주의: 실제 운영 정보 입력 시 제외 필요
 
 # Spyder project settings
 .spyderproject

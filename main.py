@@ -1,16 +1,15 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from config import settings
 
-app = FastAPI()
-
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+app = FastAPI(
+    title="FastAPI React Backend",
+    debug=settings.DEBUG
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
