@@ -13,7 +13,7 @@ class Settings:
     """환경 설정 클래스"""
     
     # 데이터베이스 설정
-    SQLALCHEMY_DATABASE_URL: str = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./myapi.db")
+    SQLALCHEMY_DATABASE_URL: str = os.getenv("SQLALCHEMY_DATABASE_URL", "mysql+pymysql://myapi_user:userpassword@localhost:3306/myapi_db")
     
     # 환경 설정
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
