@@ -6,10 +6,13 @@ from config import settings
 # 설정에서 데이터베이스 URL 가져오기
 SQLALCHEMY_DATABASE_URL = settings.get_database_url()
 
-# SQLite의 경우 connect_args 설정
+# 데이터베이스별 connect_args 설정
 connect_args = {}
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+if SQLALCHEMY_DATABASE_URL.startswith("mysql"):
+    connect_args = {
+        "charset": "utf8mb4",
+        "use_unicode": True,
+    }
 
 # 데이터베이스 엔진 생성
 engine = create_engine(

@@ -7,7 +7,7 @@ class Question(Base):
     __tablename__ = "question"
 
     id = Column(Integer, primary_key=True)
-    subject = Column(String, nullable=False)
+    subject = Column(String(200), nullable=False)  # MySQL용 길이 제한 추가
     content = Column(Text, nullable=False)
     create_date = Column(DateTime, nullable=False)
 
