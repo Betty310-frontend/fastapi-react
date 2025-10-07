@@ -7,6 +7,8 @@ from config import settings
 from database import get_db, engine
 from models import Base
 
+from domain.question import question_router
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -28,9 +30,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-@app.get("/hello")
-def hello():
-    return {"message": "안녕하세요, 파이보"}
+app.include_router(question_router.router)
 
 @app.get("/db-test")
 def test_db_connection(db: Session = Depends(get_db)):
