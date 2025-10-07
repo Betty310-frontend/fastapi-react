@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+
 import type { Question } from '../types/question'
 import { getQuestionList } from '../lib/api'
 
@@ -52,7 +54,9 @@ const QuestionList = () => {
               backgroundColor: '#f9f9f9'
             }}>
               <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
-                {question.subject}
+                <Link to={`/question/${question.id}`} style={{ textDecoration: 'none', color: '#333' }}>
+                  {question.subject}
+                </Link>
               </h3>
               <p style={{ margin: '0 0 10px 0', color: '#666' }}>
                 {question.content.length > 100 
@@ -67,6 +71,21 @@ const QuestionList = () => {
           ))}
         </ul>
       )}
+
+      <div style={{ marginTop: '20px' }}>
+        <Link 
+          to="/"
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '5px'
+          }}
+        >
+          홈으로 돌아가기
+        </Link>
+      </div>
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import { config, isDevelopment } from './config/env'
+import QuestionList from './pages/QuestionList'
+import QuestionDetail from './pages/QuestionDetail'
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <main style={{ padding: '0 20px' }}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/question/list" element={<QuestionList />} />
+            <Route path="/question/:id" element={<QuestionDetail />} />
           </Routes>
         </main>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
+
 import { testDbConnection } from '../lib/api'
-import QuestionList from './QuestionList'
+import { Link } from 'react-router'
 
 const Home = () => {
   const [dbStatus, setDbStatus] = useState<string>('')
@@ -22,9 +23,20 @@ const Home = () => {
     <div>
       <h1>파이보 홈</h1>
       <p>질문 답변 사이트입니다.</p>
-      
-      <QuestionList />
 
+      <Link 
+          to="/question/list"
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '5px'
+          }}
+        >
+        질문 목록 보기
+      </Link>
+      
       <div style={{ 
         marginTop: '30px', 
         padding: '20px', 
