@@ -1,9 +1,12 @@
+import type { Answer } from "./answer"
+
 // Question 모델 타입 정의
 export interface Question {
   id: number
   subject: string
   content: string
   create_date: string // ISO 8601 형식의 날짜 문자열
+  answers?: Answer[]
 }
 
 // API 응답 타입 정의

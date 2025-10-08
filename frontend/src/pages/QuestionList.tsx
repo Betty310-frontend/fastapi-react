@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import type { Question } from '../types/question'
+import type { ApiError } from '../types/error'
 import { getQuestionList } from '../lib/api'
+import ErrorComponent from '../components/Error'
 
 const QuestionList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<ApiError>(null)
   const [questionList, setQuestionList] = useState<Question[]>([])
 
   useEffect(() => {
@@ -18,8 +20,20 @@ const QuestionList = () => {
         const questions = await getQuestionList()
         setQuestionList(questions)
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
-        setError(errorMessage)
+        // 다양한 에러 형태 처리
+        if (typeof err === 'object' && err !== null) {
+          // API 에러 객체 (FastAPI validation error 등)
+          setError(err as ApiError)
+        } else if (err instanceof Error) {
+          // JavaScript Error 객체
+          setError(err.message)
+        } else if (typeof err === 'string') {
+          // 문자열 에러
+          setError(err)
+        } else {
+          // 기타 알 수 없는 에러
+          setError('Unknown error occurred')
+        }
       } finally {
         setIsLoading(false)
       }
@@ -31,11 +45,7 @@ const QuestionList = () => {
   if (isLoading) return <p>Loading...</p>
   
   if (error) {
-    return (
-      <div style={{ color: 'red', padding: '10px', backgroundColor: '#ffe6e6' }}>
-        <strong>Error:</strong> {error}
-      </div>
-    )
+    return <ErrorComponent error={error} />
   }
 
   return (
