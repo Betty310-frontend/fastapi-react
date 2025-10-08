@@ -106,9 +106,12 @@ const QuestionList = () => {
         </tbody>
       </Table>
 
-      <div className="mt-4">
+      <div className="d-flex justify-content-between">
         <Link to="/" className="btn btn-secondary">
           홈으로 돌아가기
+        </Link>
+        <Link to="/question-create" className="btn btn-primary">
+          질문 등록하기
         </Link>
       </div>
     </Container>
