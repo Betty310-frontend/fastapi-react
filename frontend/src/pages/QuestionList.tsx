@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
+import { formatDate } from "../config/locale";
+
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Pagination from "react-bootstrap/Pagination";
@@ -147,7 +149,7 @@ const QuestionList = () => {
                 </td>
                 <td className="text-center">
                   <small className="text-muted">
-                    {new Date(question.create_date).toLocaleString("ko-KR")}
+                    {formatDate.dateTime(question.create_date)}
                   </small>
                 </td>
               </tr>

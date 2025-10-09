@@ -12,6 +12,7 @@ import { getQuestionDetail, postAnswer } from "../lib/api";
 import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
 import ErrorComponent from "../components/Error";
+import { formatDate } from "../config/locale";
 
 const QuestionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -138,8 +139,10 @@ const QuestionDetail = () => {
           </div>
           <div className="border-top pt-3">
             <small className="text-muted">
-              📅 작성일:{" "}
-              {new Date(question.create_date).toLocaleString("ko-KR")}
+              📅 작성일: {formatDate.dateTime(question.create_date)}
+              <span className="ms-2 text-secondary">
+                ({formatDate.fromNow(question.create_date)})
+              </span>
             </small>
           </div>
         </Card.Body>
@@ -176,7 +179,7 @@ const QuestionDetail = () => {
                   </div>
                   <div className="mt-2">
                     <small className="text-muted">
-                      📅 {new Date(answer.create_date).toLocaleString("ko-KR")}
+                      📅 {formatDate.dateTime(answer.create_date)}
                     </small>
                   </div>
                 </ListGroup.Item>

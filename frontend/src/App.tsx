@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { config, isDevelopment } from "./config/env";
+import "./config/locale";
 import Home from "./pages/Home";
 import QuestionList from "./pages/QuestionList";
 import QuestionDetail from "./pages/QuestionDetail";
