@@ -1,14 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+
 import { config, isDevelopment } from "./config/env";
+import Home from "./pages/Home";
 import QuestionList from "./pages/QuestionList";
 import QuestionDetail from "./pages/QuestionDetail";
 import QuestionCreate from "./pages/QuestionCreate";
+import Navigation from "./components/Navigation";
 
 function App() {
   return (
     <Router>
       <div style={{ fontFamily: "Arial, sans-serif" }}>
+        <Navigation />
         {isDevelopment() && (
           <div
             style={{
