@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
@@ -14,12 +14,15 @@ import { getQuestionList } from "../lib/api";
 import ErrorComponent from "../components/Error";
 
 const QuestionList = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<ApiError>(null);
   const [questionList, setQuestionList] = useState<Question[]>([]);
-  const [size, setSize] = useState<number>(10);
-  const [page, setPage] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+
+  // URL 파라미터에서 page와 size 읽기
+  const page = parseInt(searchParams.get("page") || "0");
+  const size = parseInt(searchParams.get("size") || "10");
 
   const totalPages = Math.ceil(total / size);
   const pageSizeOptions = [10, 30, 50, 100];
@@ -56,9 +59,17 @@ const QuestionList = () => {
     fetchQuestionList();
   }, [page, size]);
 
+  const updatePage = (newPage: number) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("page", newPage.toString());
+    setSearchParams(newSearchParams);
+  };
+
   const handleSizeChange = (newSize: number) => {
-    setSize(newSize);
-    setPage(0);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("size", newSize.toString());
+    newSearchParams.set("page", "0"); // 크기 변경시 첫 페이지로 리셋
+    setSearchParams(newSearchParams);
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -121,6 +132,7 @@ const QuestionList = () => {
                 <td>
                   <Link
                     to={`/question/${question.id}`}
+                    state={{ fromPage: page, fromSize: size }}
                     className="text-decoration-none text-dark"
                   >
                     <div className="fw-semibold">{question.subject}</div>
@@ -146,10 +158,13 @@ const QuestionList = () => {
 
       {totalPages > 1 && (
         <Pagination className="justify-content-center">
-          <Pagination.First disabled={page === 0} onClick={() => setPage(0)} />
+          <Pagination.First
+            disabled={page === 0}
+            onClick={() => updatePage(0)}
+          />
           <Pagination.Prev
             disabled={page === 0}
-            onClick={() => setPage(page - 1)}
+            onClick={() => updatePage(page - 1)}
           />
 
           {/* 페이지 번호들 */}
@@ -170,7 +185,7 @@ const QuestionList = () => {
             // 첫 페이지와 ellipsis
             if (startPage > 0) {
               items.push(
-                <Pagination.Item key={0} onClick={() => setPage(0)}>
+                <Pagination.Item key={0} onClick={() => updatePage(0)}>
                   1
                 </Pagination.Item>
               );
@@ -185,7 +200,7 @@ const QuestionList = () => {
                 <Pagination.Item
                   key={i}
                   active={i === page}
-                  onClick={() => setPage(i)}
+                  onClick={() => updatePage(i)}
                 >
                   {i + 1}
                 </Pagination.Item>
@@ -200,7 +215,7 @@ const QuestionList = () => {
               items.push(
                 <Pagination.Item
                   key={totalPages - 1}
-                  onClick={() => setPage(totalPages - 1)}
+                  onClick={() => updatePage(totalPages - 1)}
                 >
                   {totalPages}
                 </Pagination.Item>
@@ -212,11 +227,11 @@ const QuestionList = () => {
 
           <Pagination.Next
             disabled={page === totalPages - 1}
-            onClick={() => setPage(page + 1)}
+            onClick={() => updatePage(page + 1)}
           />
           <Pagination.Last
             disabled={page === totalPages - 1}
-            onClick={() => setPage(totalPages - 1)}
+            onClick={() => updatePage(totalPages - 1)}
           />
         </Pagination>
       )}

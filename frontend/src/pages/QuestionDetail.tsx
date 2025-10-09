@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
@@ -15,6 +15,12 @@ import ErrorComponent from "../components/Error";
 
 const QuestionDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+
+  // 이전 페이지 정보 추출
+  const previousPage = location.state?.fromPage ?? 0;
+  const previousSize = location.state?.fromSize ?? 10;
+  const listUrl = `/question/list?page=${previousPage}&size=${previousSize}`;
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -106,7 +112,7 @@ const QuestionDetail = () => {
     return (
       <Container className="my-3">
         <p>질문을 찾을 수 없습니다.</p>
-        <Link to="/question/list" className="btn btn-secondary">
+        <Link to={listUrl} className="btn btn-secondary">
           질문 목록으로 돌아가기
         </Link>
       </Container>
@@ -236,7 +242,7 @@ const QuestionDetail = () => {
       </Card>
 
       <div className="mt-3">
-        <Link to="/question/list" className="btn btn-secondary">
+        <Link to={listUrl} className="btn btn-secondary">
           질문 목록으로 돌아가기
         </Link>
       </div>
