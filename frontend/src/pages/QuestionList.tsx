@@ -9,6 +9,7 @@ import Pagination from "react-bootstrap/Pagination";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Badge from "react-bootstrap/Badge";
 
 import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
@@ -131,7 +132,7 @@ const QuestionList = () => {
             questionList.map((question, index) => (
               <tr key={question.id}>
                 <td className="text-center">{page * size + 1 + index}</td>
-                <td>
+                <td className="d-flex align-items-center gap-2">
                   <Link
                     to={`/question/${question.id}`}
                     state={{ fromPage: page, fromSize: size }}
@@ -146,6 +147,9 @@ const QuestionList = () => {
                       </small>
                     )}
                   </Link>
+                  {(question.answers?.length ?? 0) > 0 && (
+                    <Badge bg="danger">{question.answers?.length ?? 0}</Badge>
+                  )}
                 </td>
                 <td className="text-center">
                   <small className="text-muted">
