@@ -112,16 +112,17 @@ const QuestionList = () => {
 
       <Table striped bordered hover responsive>
         <thead className="table-dark">
-          <tr>
+          <tr className="text-center">
             <th style={{ width: "80px" }}>번호</th>
             <th>질문 제목</th>
+            <th>글쓴이</th>
             <th style={{ width: "200px" }}>작성일</th>
           </tr>
         </thead>
         <tbody>
           {questionList.length === 0 ? (
             <tr>
-              <td colSpan={3} className="text-center py-5">
+              <td colSpan={4} className="text-center py-5">
                 <div className="text-muted">
                   <div className="mb-3" style={{ fontSize: "3rem" }}>
                     ❓
@@ -135,7 +136,7 @@ const QuestionList = () => {
             questionList.map((question, index) => (
               <tr key={question.id}>
                 <td className="text-center">{page * size + 1 + index}</td>
-                <td className="d-flex align-items-center gap-2">
+                <td className="d-flex align-items-center justify-content-start gap-2">
                   <Link
                     to={`/question/${question.id}`}
                     state={{ fromPage: page, fromSize: size }}
@@ -154,6 +155,7 @@ const QuestionList = () => {
                     <Badge bg="danger">{question.answers?.length ?? 0}</Badge>
                   )}
                 </td>
+                <td>{question?.user?.username ?? ""}</td>
                 <td className="text-center">
                   <small className="text-muted">
                     {formatDate.dateTime(question.create_date)}

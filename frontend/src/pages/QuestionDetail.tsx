@@ -7,6 +7,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
+import Badge from "react-bootstrap/Badge";
 
 import { getQuestionDetail, postAnswer } from "../lib/api";
 import type { Question } from "../types/question";
@@ -140,6 +141,11 @@ const QuestionDetail = () => {
               </p>
             ))}
           </div>
+          {question?.user?.username && (
+            <Badge bg="light" text="dark" className="p-2 text-start">
+              <div className="mb-2">{question.user.username}</div>
+            </Badge>
+          )}
           <div className="border-top pt-3">
             <small className="text-muted">
               📅 작성일: {formatDate.dateTime(question.create_date)}
@@ -181,9 +187,20 @@ const QuestionDetail = () => {
                     </div>
                   </div>
                   <div className="mt-2">
-                    <small className="text-muted">
-                      📅 {formatDate.dateTime(answer.create_date)}
-                    </small>
+                    <div className="d-flex justify-content-between align-items-center">
+                      {answer?.user?.username && (
+                        <Badge
+                          bg="light"
+                          text="dark"
+                          className="p-2 text-start"
+                        >
+                          {answer.user.username}
+                        </Badge>
+                      )}
+                      <small className="text-muted">
+                        📅 {formatDate.dateTime(answer.create_date)}
+                      </small>
+                    </div>
                   </div>
                 </ListGroup.Item>
               ))}
