@@ -4,9 +4,18 @@ import { useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
+import NavDropdown from "react-bootstrap/NavDropdown";
+
+import { useAuthStore } from "../stores/authStore";
 
 const Navigation = () => {
   const [expanded, setExpanded] = useState(false);
+  const { user, isAuthenticated, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    setExpanded(false);
+  };
 
   return (
     <Navbar
@@ -41,20 +50,35 @@ const Navigation = () => {
             </Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link
-              as={Link}
-              to="/user-create"
-              onClick={() => setExpanded(false)}
-            >
-              회원가입
-            </Nav.Link>
-            <Nav.Link
-              as={Link}
-              to="/user-login"
-              onClick={() => setExpanded(false)}
-            >
-              로그인
-            </Nav.Link>
+            {isAuthenticated ? (
+              // 로그인 상태
+              <NavDropdown
+                title={`안녕하세요, ${user?.username}님!`}
+                id="user-dropdown"
+              >
+                <NavDropdown.Item onClick={handleLogout}>
+                  로그아웃
+                </NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              // 비로그인 상태
+              <>
+                <Nav.Link
+                  as={Link}
+                  to="/user-create"
+                  onClick={() => setExpanded(false)}
+                >
+                  회원가입
+                </Nav.Link>
+                <Nav.Link
+                  as={Link}
+                  to="/user-login"
+                  onClick={() => setExpanded(false)}
+                >
+                  로그인
+                </Nav.Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

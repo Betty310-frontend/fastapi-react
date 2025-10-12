@@ -17,6 +17,16 @@ def _hash_password(password: str) -> str:
     hashed = bcrypt.hashpw(password_bytes, salt)
     return hashed.decode('utf-8')
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    평문 비밀번호와 해시된 비밀번호를 비교
+    """
+    password_bytes = plain_password.encode('utf-8')
+    if len(password_bytes) > 72:
+        password_bytes = password_bytes[:72]
+    
+    return bcrypt.checkpw(password_bytes, hashed_password.encode('utf-8'))
+
 def create_user(db: Session, user_create: UserCreate):
     hashed_password = _hash_password(user_create.password1)
     db_user = User(username=user_create.username, password=hashed_password, email=user_create.email)
@@ -25,3 +35,6 @@ def create_user(db: Session, user_create: UserCreate):
 
 def get_existing_user(db: Session, user_create: UserCreate):
     return db.query(User).filter((User.username == user_create.username) | (User.email == user_create.email)).first()
+
+def get_user(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()

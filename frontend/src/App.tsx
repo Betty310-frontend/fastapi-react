@@ -7,6 +7,7 @@ import QuestionList from "./pages/QuestionList";
 import QuestionDetail from "./pages/QuestionDetail";
 import QuestionCreate from "./pages/QuestionCreate";
 import UserCreate from "./pages/UserCreate";
+import UserLoginPage from "./pages/UserLogin";
 import Navigation from "./components/Navigation";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
             <Route path="/question/:id" element={<QuestionDetail />} />
             <Route path="/question-create" element={<QuestionCreate />} />
             <Route path="/user-create" element={<UserCreate />} />
+            <Route path="/user-login" element={<UserLoginPage />} />
           </Routes>
         </main>
       </div>
