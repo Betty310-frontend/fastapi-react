@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
+from starlette.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from config import settings
@@ -37,6 +38,7 @@ app.add_middleware(
 app.include_router(question_router.router)
 app.include_router(answer_router.router)
 app.include_router(user_router.router)
+app.mount('/assets', StaticFiles(directory='frontend/dist/assets'))
 
 # Validation Error 핸들러 추가
 @app.exception_handler(RequestValidationError)
@@ -66,3 +68,7 @@ def test_db_connection(db: Session = Depends(get_db)):
         return {"status": "success", "message": "MySQL 데이터베이스 연결 성공"}
     except Exception as e:
         return {"status": "error", "message": f"데이터베이스 연결 실패: {str(e)}"}
+
+@app.get('/')
+def index():
+    return FileResponse('frontend/dist/index.html')
