@@ -14,6 +14,8 @@ import {
   deleteQuestion,
   getQuestionDetail,
   postAnswer,
+  postVoteAnswer,
+  postVoteQuestion,
 } from "../lib/api";
 import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
@@ -155,6 +157,42 @@ const QuestionDetail = () => {
     }
   };
 
+  const onClickVote = async (
+    voteType: "question" | "answer",
+    voteId: number
+  ) => {
+    if (!voteId) return;
+
+    const confirmed = window.confirm(
+      voteType === "question"
+        ? "이 질문을 추천하시겠습니까?"
+        : "이 답변을 추천하시겠습니까?"
+    );
+    if (!confirmed) return;
+
+    try {
+      if (voteType === "question") {
+        await postVoteQuestion(voteId);
+      } else {
+        await postVoteAnswer(voteId);
+      }
+
+      const updatedQuestion = await getQuestionDetail(parseInt(id ?? "0"));
+      setQuestion(updatedQuestion);
+    } catch (err) {
+      // 에러 처리
+      if (typeof err === "object" && err !== null) {
+        setError(err as ApiError);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === "string") {
+        setError(err);
+      } else {
+        setError("Failed to vote");
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <Container className="my-5 text-center">
@@ -194,7 +232,13 @@ const QuestionDetail = () => {
               </p>
             ))}
           </div>
-          <div className="border-top pt-3 d-flex justify-content-between align-items-center">
+          <div
+            className={`border-top pt-3 d-flex align-items-center ${
+              question?.user?.username
+                ? "justify-content-between"
+                : "justify-content-end"
+            }`}
+          >
             {question?.user?.username && (
               <Badge bg="light" text="dark" className="p-2 text-start">
                 {question.user.username}
@@ -217,10 +261,11 @@ const QuestionDetail = () => {
               )}
             </div>
           </div>
-          {currentUser &&
+          <div className="my-2 d-flex justify-content-end gap-2">
+            {currentUser &&
             question.user &&
-            currentUser?.id === question.user.id && (
-              <div className="my-3 d-flex justify-content-end gap-2">
+            currentUser?.id === question.user.id ? (
+              <>
                 <Link
                   to={`/question-modify/${id}`}
                   state={{
@@ -239,8 +284,20 @@ const QuestionDetail = () => {
                 >
                   질문 삭제
                 </Button>
-              </div>
+              </>
+            ) : (
+              <Button
+                onClick={() => onClickVote("question", question.id)}
+                variant="outline-primary"
+                size="sm"
+              >
+                추천
+                <Badge bg="success" className="rounded-pill ms-1">
+                  {question.voter?.length ?? 0}
+                </Badge>
+              </Button>
             )}
+          </div>
         </Card.Body>
       </Card>
 
@@ -274,7 +331,9 @@ const QuestionDetail = () => {
                     </div>
                   </div>
                   <div className="mt-2">
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div
+                      className={`d-flex align-items-center justify-content-between`}
+                    >
                       {answer?.user?.username && (
                         <Badge
                           bg="light"
@@ -295,23 +354,36 @@ const QuestionDetail = () => {
                         )}
                       </div>
                     </div>
-                    {answer?.user?.id === currentUser?.id && (
-                      <div className="my-3 d-flex justify-content-end gap-2">
-                        <Link
-                          className="btn btn-outline-secondary btn-sm"
-                          to={`/answer-modify/${answer.id}/${question.id}`}
-                        >
-                          수정
-                        </Link>
+                    <div className="my-3 d-flex justify-content-end gap-2">
+                      {answer?.user?.id === currentUser?.id ? (
+                        <>
+                          <Link
+                            className="btn btn-outline-secondary btn-sm"
+                            to={`/answer-modify/${answer.id}/${question.id}`}
+                          >
+                            수정
+                          </Link>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => onDeleteAnswer(answer.id)}
+                          >
+                            삭제
+                          </Button>
+                        </>
+                      ) : (
                         <Button
-                          variant="outline-danger"
+                          variant="outline-primary"
                           size="sm"
-                          onClick={() => onDeleteAnswer(answer.id)}
+                          onClick={() => onClickVote("answer", answer.id)}
                         >
-                          삭제
+                          추천
+                          <Badge bg="success" className="rounded-pill ms-1">
+                            {answer.voter?.length ?? 0}
+                          </Badge>
                         </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </ListGroup.Item>
               ))}

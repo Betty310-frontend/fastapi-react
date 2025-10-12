@@ -155,7 +155,9 @@ const QuestionList = () => {
                     <Badge bg="danger">{question.answers?.length ?? 0}</Badge>
                   )}
                 </td>
-                <td>{question?.user?.username ?? ""}</td>
+                <td className="text-center">
+                  {question?.user?.username ?? ""}
+                </td>
                 <td className="text-center">
                   <small className="text-muted">
                     {formatDate.dateTime(question.create_date)}

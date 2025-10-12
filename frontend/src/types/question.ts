@@ -10,6 +10,7 @@ export interface Question {
   answers?: Answer[];
   user?: User;
   modify_date?: string;
+  voter?: User[];
 }
 
 // API 응답 타입 정의
