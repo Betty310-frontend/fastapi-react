@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { marked } from "marked";
 
 import { formatDate } from "../config/locale";
 
@@ -144,11 +145,17 @@ const QuestionList = () => {
                   >
                     <div className="fw-semibold">{question.subject}</div>
                     {question.content && (
-                      <small className="text-muted">
-                        {question.content.length > 50
-                          ? `${question.content.substring(0, 50)}...`
-                          : question.content}
-                      </small>
+                      <small
+                        className="text-muted"
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            question.content.length > 30
+                              ? marked.parse(
+                                  question.content.substring(0, 30) + "..."
+                                )
+                              : marked.parse(question.content),
+                        }}
+                      />
                     )}
                   </Link>
                   {(question.answers?.length ?? 0) > 0 && (

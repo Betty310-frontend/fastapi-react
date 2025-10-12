@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 
+import { marked } from "marked";
+
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -225,13 +227,10 @@ const QuestionDetail = () => {
           </div>
         </Card.Header>
         <Card.Body>
-          <div className="mb-3">
-            {question.content.split("\n").map((line, index) => (
-              <p key={index} className="mb-2">
-                {line}
-              </p>
-            ))}
-          </div>
+          <div
+            className="mb-3"
+            dangerouslySetInnerHTML={{ __html: marked.parse(question.content) }}
+          />
           <div
             className={`border-top pt-3 d-flex align-items-center ${
               question?.user?.username
@@ -323,11 +322,12 @@ const QuestionDetail = () => {
                       <span className="badge bg-secondary me-2">
                         #{index + 1}
                       </span>
-                      <div className="mt-2">
-                        {answer.content.split("\n").map((line, i) => (
-                          <div key={i}>{line}</div>
-                        ))}
-                      </div>
+                      <div
+                        className="mt-2"
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(answer.content),
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="mt-2">
