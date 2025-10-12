@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import QuestionList from "./pages/QuestionList";
 import QuestionDetail from "./pages/QuestionDetail";
 import QuestionCreate from "./pages/QuestionCreate";
+import UserCreate from "./pages/UserCreate";
 import Navigation from "./components/Navigation";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/question/list" element={<QuestionList />} />
             <Route path="/question/:id" element={<QuestionDetail />} />
             <Route path="/question-create" element={<QuestionCreate />} />
+            <Route path="/user-create" element={<UserCreate />} />
           </Routes>
         </main>
       </div>

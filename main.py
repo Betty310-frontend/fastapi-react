@@ -9,6 +9,7 @@ from models import Base
 
 from domain.question import question_router
 from domain.answer import answer_router
+from domain.user import user_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +34,7 @@ app.add_middleware(
 
 app.include_router(question_router.router)
 app.include_router(answer_router.router)
+app.include_router(user_router.router)
 
 @app.get("/db-test")
 def test_db_connection(db: Session = Depends(get_db)):
