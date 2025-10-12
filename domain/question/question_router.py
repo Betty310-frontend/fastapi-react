@@ -4,6 +4,8 @@ from starlette import status
 
 from database import get_db
 from domain.question import question_schema, question_crud
+from domain.user.user_router import get_current_user
+from models import User
 
 router = APIRouter(
     prefix="/api/question"
@@ -24,5 +26,7 @@ def question_detail(question_id:int, db:Session=Depends(get_db)):
     return _question
 
 @router.post('/create', response_model=question_schema.Question, status_code=status.HTTP_201_CREATED)
-def question_create(question_create:question_schema.QuestionCreate, db: Session=Depends(get_db)):
-    return question_crud.create_question(db=db, question_create=question_create)
+def question_create(question_create:question_schema.QuestionCreate, 
+                    db: Session=Depends(get_db), 
+                    current_user: User=Depends(get_current_user)):
+    return question_crud.create_question(db=db, question_create=question_create, user=current_user)

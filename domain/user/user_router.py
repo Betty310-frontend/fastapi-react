@@ -2,8 +2,8 @@ import os
 from datetime import timedelta, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
+from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from starlette import status
 from dotenv import load_dotenv
@@ -18,6 +18,9 @@ load_dotenv()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
+
+# HTTP Bearer 토큰을 위한 보안 스키마 (OAuth2PasswordBearer 대신)
+bearer_scheme = HTTPBearer()
 
 # SECRET_KEY가 없으면 에러 발생
 if not SECRET_KEY:
@@ -78,3 +81,23 @@ def login_oauth2_format(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
         'token_type': 'bearer',
         'username': user.username
     }
+
+def get_current_user(credentials: HTTPBearer = Depends(bearer_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate":"Bearer"}
+    )
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    else:
+        user = user_crud.get_user(db, username=username)
+        if user is None:
+            raise credentials_exception
+        return user

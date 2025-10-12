@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from config import settings
@@ -35,6 +37,26 @@ app.add_middleware(
 app.include_router(question_router.router)
 app.include_router(answer_router.router)
 app.include_router(user_router.router)
+
+# Validation Error 핸들러 추가
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print(f"Validation error on {request.method} {request.url}")
+    print(f"Request headers: {request.headers}")
+    print(f"Validation errors: {exc.errors()}")
+    try:
+        body = await request.body()
+        print(f"Request body: {body}")
+    except:
+        print("Could not read request body")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "message": "Validation error occurred. Check server logs for details."
+        }
+    )
 
 @app.get("/db-test")
 def test_db_connection(db: Session = Depends(get_db)):

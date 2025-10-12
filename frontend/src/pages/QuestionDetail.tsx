@@ -13,10 +13,13 @@ import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
 import ErrorComponent from "../components/Error";
 import { formatDate } from "../config/locale";
+import { useIsAuthenticated } from "../stores/authStore";
 
 const QuestionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+
+  const isAuthenticated = useIsAuthenticated();
 
   // 이전 페이지 정보 추출
   const previousPage = location.state?.fromPage ?? 0;
@@ -210,6 +213,7 @@ const QuestionDetail = () => {
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="답변을 입력해주세요..."
                 required
+                disabled={isSubmitting || !isAuthenticated}
               />
             </Form.Group>
             <div className="d-flex justify-content-end gap-2">
@@ -217,14 +221,14 @@ const QuestionDetail = () => {
                 variant="outline-secondary"
                 type="button"
                 onClick={() => setContent("")}
-                disabled={!content.trim() || isSubmitting}
+                disabled={!content.trim() || isSubmitting || !isAuthenticated}
               >
                 초기화
               </Button>
               <Button
                 variant="primary"
                 type="submit"
-                disabled={!content.trim() || isSubmitting}
+                disabled={!content.trim() || isSubmitting || !isAuthenticated}
               >
                 {isSubmitting ? (
                   <>

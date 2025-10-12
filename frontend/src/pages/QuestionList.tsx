@@ -15,8 +15,11 @@ import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
 import { getQuestionList } from "../lib/api";
 import ErrorComponent from "../components/Error";
+import { useIsAuthenticated } from "../stores/authStore";
 
 const QuestionList = () => {
+  const isAuthenticated = useIsAuthenticated();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<ApiError>(null);
@@ -259,7 +262,11 @@ const QuestionList = () => {
         <Link to="/" className="btn btn-secondary">
           홈으로 돌아가기
         </Link>
-        <Link to="/question-create" className="btn btn-primary">
+        <Link
+          to="/question-create"
+          className="btn btn-primary"
+          hidden={!isAuthenticated}
+        >
           질문 등록하기
         </Link>
       </div>

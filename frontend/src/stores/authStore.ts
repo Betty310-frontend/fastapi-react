@@ -73,3 +73,6 @@ export const useUser = () => useAuthStore((state) => state.user);
 export const useToken = () => useAuthStore((state) => state.token);
 export const useIsAuthenticated = () =>
   useAuthStore((state) => state.isAuthenticated);
+
+// Hook이 아닌 함수에서 토큰을 가져올 때 사용
+export const getToken = () => useAuthStore.getState().token;
