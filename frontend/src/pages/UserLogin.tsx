@@ -42,10 +42,13 @@ const UserLoginPage = () => {
       setIsSubmitting(true);
       setError(null);
 
-      const result = await loginUser(formData.username, formData.password);
+      const { access_token, user } = await loginUser(
+        formData.username,
+        formData.password
+      );
 
       // 로그인 성공 시 store에 저장
-      login({ username: result.username }, result.access_token);
+      login(user, access_token);
 
       // 성공 메시지와 함께 홈 페이지로 이동
       navigate("/", {

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from domain.question.question_schema import QuestionCreate
+from domain.question.question_schema import QuestionCreate, QuestionUpdate
 from models import Question, User
 from sqlalchemy.orm import Session
 
@@ -24,3 +24,14 @@ def create_question(db:Session, question_create:QuestionCreate, user:User):
     db.commit()
     db.refresh(db_question)  # 데이터베이스에서 생성된 ID를 가져옴
     return db_question
+
+def update_question(db: Session, db_question: Question, question_update: QuestionUpdate):
+    db_question.subject=  question_update.subject
+    db_question.content = question_update.content
+    db_question.modify_date = datetime.now()
+    db.add(db_question)
+    db.commit()
+
+def delete_question(db: Session, db_question: Question):
+    db.delete(db_question)
+    db.commit()

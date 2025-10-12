@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
@@ -9,18 +9,25 @@ import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
 
-import { getQuestionDetail, postAnswer } from "../lib/api";
+import {
+  deleteAnswer,
+  deleteQuestion,
+  getQuestionDetail,
+  postAnswer,
+} from "../lib/api";
 import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
 import ErrorComponent from "../components/Error";
 import { formatDate } from "../config/locale";
-import { useIsAuthenticated } from "../stores/authStore";
+import { useIsAuthenticated, useUser } from "../stores/authStore";
 
 const QuestionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isAuthenticated = useIsAuthenticated();
+  const currentUser = useUser();
 
   // 이전 페이지 정보 추출
   const previousPage = location.state?.fromPage ?? 0;
@@ -102,6 +109,52 @@ const QuestionDetail = () => {
     }
   }
 
+  const onDeleteQuestion = async () => {
+    if (!id) return;
+
+    try {
+      await deleteQuestion(parseInt(id));
+      // 삭제 후 목록 페이지로 리다이렉트
+      navigate(listUrl);
+    } catch (err) {
+      // 에러 처리
+      if (typeof err === "object" && err !== null) {
+        setError(err as ApiError);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === "string") {
+        setError(err);
+      } else {
+        setError("Failed to delete question");
+      }
+    }
+  };
+
+  const onDeleteAnswer = async (answerId: number) => {
+    if (!answerId) return;
+
+    try {
+      await deleteAnswer(answerId);
+
+      // 삭제 후 질문 데이터 다시 가져오기 (최신 답변 포함)
+      if (id) {
+        const updatedQuestion = await getQuestionDetail(parseInt(id));
+        setQuestion(updatedQuestion);
+      }
+    } catch (err) {
+      // 에러 처리
+      if (typeof err === "object" && err !== null) {
+        setError(err as ApiError);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else if (typeof err === "string") {
+        setError(err);
+      } else {
+        setError("Failed to delete answer");
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <Container className="my-5 text-center">
@@ -141,19 +194,53 @@ const QuestionDetail = () => {
               </p>
             ))}
           </div>
-          {question?.user?.username && (
-            <Badge bg="light" text="dark" className="p-2 text-start">
-              <div className="mb-2">{question.user.username}</div>
-            </Badge>
-          )}
-          <div className="border-top pt-3">
-            <small className="text-muted">
-              📅 작성일: {formatDate.dateTime(question.create_date)}
-              <span className="ms-2 text-secondary">
-                ({formatDate.fromNow(question.create_date)})
-              </span>
-            </small>
+          <div className="border-top pt-3 d-flex justify-content-between align-items-center">
+            {question?.user?.username && (
+              <Badge bg="light" text="dark" className="p-2 text-start">
+                {question.user.username}
+              </Badge>
+            )}
+            <div className="d-flex flex-column align-items-end">
+              <small className="text-muted">
+                📅 작성일: {formatDate.dateTime(question.create_date)}
+                <span className="ms-2 text-secondary">
+                  ({formatDate.fromNow(question.create_date)})
+                </span>
+              </small>
+              {question?.modify_date && (
+                <small className="text-muted">
+                  수정일: {formatDate.dateTime(question.modify_date)}
+                  <span className="ms-2 text-secondary">
+                    ({formatDate.fromNow(question.modify_date)})
+                  </span>
+                </small>
+              )}
+            </div>
           </div>
+          {currentUser &&
+            question.user &&
+            currentUser?.id === question.user.id && (
+              <div className="my-3 d-flex justify-content-end gap-2">
+                <Link
+                  to={`/question-modify/${id}`}
+                  state={{
+                    question: question,
+                    fromPage: previousPage,
+                    fromSize: previousSize,
+                  }}
+                  className="btn btn-outline-primary btn-sm"
+                >
+                  질문 수정
+                </Link>
+                <Button
+                  onClick={onDeleteQuestion}
+                  variant="outline-danger"
+                  size="sm"
+                >
+                  질문 삭제
+                </Button>
+              </div>
+            )}
         </Card.Body>
       </Card>
 
@@ -197,10 +284,34 @@ const QuestionDetail = () => {
                           {answer.user.username}
                         </Badge>
                       )}
-                      <small className="text-muted">
-                        📅 {formatDate.dateTime(answer.create_date)}
-                      </small>
+                      <div className="d-flex flex-column align-items-end">
+                        <small className="text-muted">
+                          📅 작성일: {formatDate.dateTime(answer.create_date)}
+                        </small>
+                        {answer?.modify_date && (
+                          <small className="text-muted ms-3">
+                            수정일: {formatDate.dateTime(answer.modify_date)}
+                          </small>
+                        )}
+                      </div>
                     </div>
+                    {answer?.user?.id === currentUser?.id && (
+                      <div className="my-3 d-flex justify-content-end gap-2">
+                        <Link
+                          className="btn btn-outline-secondary btn-sm"
+                          to={`/answer-modify/${answer.id}/${question.id}`}
+                        >
+                          수정
+                        </Link>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => onDeleteAnswer(answer.id)}
+                        >
+                          삭제
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </ListGroup.Item>
               ))}

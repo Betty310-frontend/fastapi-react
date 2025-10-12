@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
@@ -49,14 +49,18 @@ def login_for_access_token(login_data: user_schema.UserLogin, db: Session = Depe
 
     data = {
         'sub': user.username,
-        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        'exp': datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
     return {
         'access_token': access_token,
         'token_type': 'bearer',
-        'username': user.username
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email
+        }
     }
 
 # OAuth2 형식의 로그인도 지원 (기존 호환성을 위해)
@@ -72,14 +76,18 @@ def login_oauth2_format(form_data: OAuth2PasswordRequestForm = Depends(), db: Se
 
     data = {
         'sub': user.username,
-        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        'exp': datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
     return {
         'access_token': access_token,
         'token_type': 'bearer',
-        'username': user.username
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email
+        }
     }
 
 def get_current_user(credentials: HTTPBearer = Depends(bearer_scheme), db: Session = Depends(get_db)):

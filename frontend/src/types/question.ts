@@ -9,6 +9,7 @@ export interface Question {
   create_date: string; // ISO 8601 형식의 날짜 문자열
   answers?: Answer[];
   user?: User;
+  modify_date?: string;
 }
 
 // API 응답 타입 정의

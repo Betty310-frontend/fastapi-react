@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-interface User {
-  username: string;
-  email?: string;
-}
+import type { User } from "../types/user";
 
 interface AuthState {
   user: User | null;

@@ -29,12 +29,12 @@ class UserLogin(BaseModel):
             raise ValueError('빈 값은 허용되지 않습니다.')
         return v
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    username: str
-
 class User(BaseModel):
     id: int
     username: str
     email: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: User

@@ -1,10 +1,7 @@
 import { createContext, useReducer, useEffect } from "react";
 import type { ReactNode } from "react";
 
-interface User {
-  username: string;
-  email: string;
-}
+import type { User } from "../types/user";
 
 interface AuthState {
   user: User | null;
