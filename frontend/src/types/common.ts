@@ -1,6 +1,7 @@
 export interface ListReq {
   page: number;
   size: number;
+  keyword?: string;
 }
 
 export interface ListRes<T> {

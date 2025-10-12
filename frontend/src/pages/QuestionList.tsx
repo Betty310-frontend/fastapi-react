@@ -11,6 +11,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 
 import type { Question } from "../types/question";
 import type { ApiError } from "../types/error";
@@ -22,6 +23,7 @@ const QuestionList = () => {
   const isAuthenticated = useIsAuthenticated();
 
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<ApiError>(null);
   const [questionList, setQuestionList] = useState<Question[]>([]);
@@ -30,6 +32,7 @@ const QuestionList = () => {
   // URL 파라미터에서 page와 size 읽기
   const page = parseInt(searchParams.get("page") || "0");
   const size = parseInt(searchParams.get("size") || "10");
+  const keyword = searchParams.get("keyword") || "";
 
   const totalPages = Math.ceil(total / size);
   const pageSizeOptions = [10, 30, 50, 100];
@@ -39,8 +42,7 @@ const QuestionList = () => {
       try {
         setIsLoading(true);
         setError(null);
-
-        const response = await getQuestionList({ page, size });
+        const response = await getQuestionList({ page, size, keyword });
         setQuestionList(response.items);
         setTotal(response.total);
       } catch (err) {
@@ -64,7 +66,14 @@ const QuestionList = () => {
     };
 
     fetchQuestionList();
-  }, [page, size]);
+  }, [page, size, keyword]);
+
+  const handleSearchList = (newKeyword: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("keyword", newKeyword);
+    newSearchParams.set("page", "0"); // 검색 시 페이지 0으로 리셋
+    setSearchParams(newSearchParams);
+  };
 
   const updatePage = (newPage: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -92,22 +101,41 @@ const QuestionList = () => {
           <h2 className="mb-0">질문 목록</h2>
         </Col>
         <Col xs="auto">
-          <div className="d-flex align-items-center gap-2">
-            <span className="text-muted">페이지당</span>
-            <Form.Select
-              size="sm"
-              value={size}
-              onChange={(e) => handleSizeChange(parseInt(e.target.value))}
-              style={{ width: "80px" }}
+          <Row className="my-3">
+            <Form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const input = form.elements.namedItem(
+                  "keyword"
+                ) as HTMLInputElement;
+                handleSearchList(input.value);
+              }}
             >
-              {pageSizeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </Form.Select>
-            <span className="text-muted">개씩</span>
-          </div>
+              <Form.Group
+                as={Row}
+                className="align-items-center"
+                controlId="formKeyword"
+              >
+                <Col xs="auto">
+                  <Form.Label className="mb-0">검색</Form.Label>
+                </Col>
+                <Col xs="auto">
+                  <Form.Control
+                    type="text"
+                    name="keyword"
+                    placeholder="검색어를 입력하세요"
+                    defaultValue={keyword}
+                  />
+                </Col>
+                <Col xs="auto">
+                  <Button type="submit" variant="primary">
+                    검색
+                  </Button>
+                </Col>
+              </Form.Group>
+            </Form>
+          </Row>
         </Col>
       </Row>
 
@@ -265,7 +293,23 @@ const QuestionList = () => {
           </small>
         </Col>
         <Col xs="auto">
-          <small className="text-muted">페이지당 {size}개씩 표시</small>
+          <div className="d-flex align-items-center gap-2">
+            <span className="text-muted">페이지당</span>
+            <Form.Select
+              size="sm"
+              value={size}
+              onChange={(e) => handleSizeChange(parseInt(e.target.value))}
+              style={{ width: "80px" }}
+            >
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Form.Select>
+            <span className="text-muted">개씩</span>
+          </div>
+          {/* <small className="text-muted">페이지당 {size}개씩 표시</small> */}
         </Col>
       </Row>
 

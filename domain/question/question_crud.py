@@ -1,15 +1,27 @@
 from datetime import datetime
 
-from domain.question.question_schema import QuestionCreate, QuestionUpdate
-from models import Question, User
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
-def get_question_list(db:Session, skip:int = 0, limit:int = 10):
-    _question_list = db.query(Question).order_by(Question.create_date.desc())
+from domain.question.question_schema import QuestionCreate, QuestionUpdate
+from models import Question, User, Answer
 
-    total = _question_list.count()
-    items = _question_list.offset(skip).limit(limit).all()
-    return total, items
+def get_question_list(db:Session, skip:int = 0, limit:int = 10, keyword: str = ''):
+    question_list = db.query(Question)
+
+    if keyword:
+        search = '%%{}%%'.format(keyword)
+        sub_query = db.query(Answer.question_id, Answer.content, User.username).outerjoin(User, and_(Answer.user_id == User.id)).subquery()
+        question_list = question_list.outerjoin(User).outerjoin(sub_query, and_(sub_query.c.question_id == Question.id)).filter(
+            Question.subject.ilike(search) |
+            Question.content.ilike(search) |
+            User.username.ilike(search) |
+            sub_query.c.content.ilike(search) |
+            sub_query.c.username.ilike(search)
+        )
+    total = question_list.distinct().count()
+    question_list = question_list.order_by(Question.create_date.desc()).offset(skip).limit(limit).distinct().all()
+    return total, question_list
 
 def get_question(db:Session, question_id:int):
     question = db.query(Question).get(question_id)
